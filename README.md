@@ -34,8 +34,11 @@ Each prompt is built to close those three.
 |---|---|---|
 | [eMudhra CA — endpoint](prompts/emudhra-ca-compromise/endpoint-audit.md) | macOS / Windows / Linux laptop, incl. WSL | Every trust store on the machine, runtimes with compiled-in roots, TLS verification turned off |
 | [eMudhra CA — EC2 / server](prompts/emudhra-ca-compromise/aws-ec2-audit.md) | EC2 instance or Linux server | The same, plus containers, outbound dependency mapping, and whether a fix survives the next scale-out |
+| [Railway exposure — workspace](prompts/railway-env-exposure/workspace-audit.md) | Workstation with the `railway` CLI | What was exposed, what each credential can do, and what to rotate first — without ever reading a value |
+| [Railway exposure — downstream](prompts/railway-env-exposure/downstream-abuse-audit.md) | AWS, Stripe, GitHub, model providers, databases | Whether anything was actually used, and how long the logs will still say |
 
-Background on that incident: [prompts/emudhra-ca-compromise/README.md](prompts/emudhra-ca-compromise/README.md).
+Background on each incident: [eMudhra](prompts/emudhra-ca-compromise/README.md) ·
+[Railway](prompts/railway-env-exposure/README.md).
 
 ## Ground rules, in every prompt
 
@@ -43,7 +46,10 @@ Background on that incident: [prompts/emudhra-ca-compromise/README.md](prompts/e
 - **No network probes** from the audited host. Public advisory research is
   allowed; sending anything about the machine anywhere is not.
 - **No secrets in the output.** Settings are reported, values are redacted,
-  usernames and hostnames never appear.
+  usernames and hostnames never appear. Where the subject of the audit *is*
+  a pile of credentials, the rule hardens: values are never read into the
+  agent's context at all, because an agent's context is somebody else's
+  server.
 - **Verify before judging.** Every prompt opens with a fact-checking step and
   reports which facts it could and could not confirm.
 - **Report, never remediate.** Fixes are written down for a human.
