@@ -138,13 +138,29 @@ than trusting the characterisations here.
 
 **Cloud providers (AWS, GCP, Azure).** The richest logs and the most common
 trap. For AWS, search CloudTrail for the key identifier as `userIdentity.
-accessKeyId` across the window. Note carefully that CloudTrail Event history
-covers management events only — data events such as S3 object reads and Lambda
-invocations are absent unless a trail was configured in advance. **This is the
-most important negative result in the entire audit**: if no trail exists, the
-data access, which is to say the actual theft, was never recorded at all. Say
-so explicitly. "No evidence in CloudTrail" without that caveat is dangerously
-misleading.
+accessKeyId` across the window.
+
+Three documented limits on Event history decide whether your search means
+anything, and all three produce a clean-looking empty result:
+
+- **Management events only.** Data events — S3 object reads, Lambda
+  invocations — are not shown, and neither are Insights or network activity
+  events. **This is the most important negative result in the entire audit:**
+  if no trail or event data store was configured in advance, the data access,
+  which is to say the actual theft, was never recorded at all.
+- **One region per search.** Event history returns events from a single AWS
+  Region and a single account. Searching your usual region and finding nothing
+  says nothing whatsoever about the other regions — which is precisely where
+  someone working with stolen credentials would operate, because that is where
+  nobody is looking. Repeat the search per region, or use CloudTrail Lake,
+  which can query across regions and accounts.
+- **90 days, and one filter at a time.** Event history holds the past 90 days
+  and accepts a single attribute filter plus a time range, so you cannot
+  narrow by key *and* source address in one query.
+
+Report which of these applied. "No evidence in CloudTrail" without naming the
+limits that shaped the search is dangerously misleading, and it is the
+sentence most likely to be quoted back as an all-clear.
 
 Look beyond reads. An attacker with a cloud key frequently creates persistence
 that survives rotating the key they came in with: new IAM users, new access
